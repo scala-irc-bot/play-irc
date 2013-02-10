@@ -10,12 +10,19 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     // Add your project dependencies here,
     jdbc,
-    anorm
+    anorm,
+    "org.sisioh" %% "scala-dddbase-core" % "0.0.1"
   )
 
+  def customLessEntryPoints(base: File): PathFinder = (
+    (base / "app" / "assets" / "stylesheets" / "bootstrap" * "bootstrap.less") +++
+    (base / "app" / "assets" / "stylesheets" * "*.less")
+  )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    // Add your own project settings here
+    resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns),
+    lessEntryPoints <<= baseDirectory(customLessEntryPoints)
   )
 
 }
