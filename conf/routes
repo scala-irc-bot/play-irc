@@ -3,8 +3,10 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-GET     /users/login                 net.mtgto.controllers.UserController.login
+GET     /                            net.mtgto.controllers.Application.index
+GET     /login                       net.mtgto.controllers.Application.login
+GET     /logout                      net.mtgto.controllers.Application.logout
+POST    /authenticate                net.mtgto.controllers.Application.authenticate
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
