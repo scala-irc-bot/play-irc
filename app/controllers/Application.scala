@@ -6,11 +6,14 @@ import play.api.data.Form
 import play.api.data.Forms._
 
 import net.mtgto.domain.{User, UserRepository}
+import net.mtgto.infrastracture.{UserDao, DatabaseUserDao}
 
 import scalaz.Identity
 
 object Application extends Controller with Secured {
   protected[this] val userRepository: UserRepository = new UserRepository {
+    private val userDao: UserDao = new DatabaseUserDao
+
     private def getDummyUser(identifier: Identity[Int]): User = {
       new User {
         override val identity = identifier
@@ -18,9 +21,8 @@ object Application extends Controller with Secured {
       }
     }
     def findByNameAndPassword(name: String, password: String): Option[User] = {
-      (name, password) match {
-        case ("admin", "admin") => Some(getDummyUser(Identity(1)))
-        case _ => None
+      userDao.findByNameAndPassword(name, password).map {
+        infraUser => User(Identity(infraUser.id), infraUser.name)
       }
     }
 
@@ -29,18 +31,17 @@ object Application extends Controller with Secured {
     }
 
     override def resolveOption(identifier: Identity[Int]): Option[User] = {
-      identifier.value match {
-        case 1 => Some(getDummyUser(Identity(1)))
-        case _ => None
+      userDao.findById(identifier.value).map {
+        infraUser => User(Identity(infraUser.id), infraUser.name)
       }
     }
 
     override def contains(identifier: Identity[Int]): Boolean = {
-      identifier.value == 1
+      resolveOption(identifier).isDefined
     }
 
     override def contains(entity: User): Boolean = {
-      entity.identity.value == 1
+      resolveOption(entity.identity).isDefined
     }
   }
 
