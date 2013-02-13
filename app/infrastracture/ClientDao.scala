@@ -11,7 +11,7 @@ trait ClientDao {
 }
 
 class DatabaseClientDao extends ClientDao {
-  protected[this] def convertRowToClient(row: Row) = {
+  protected[this] def convertRowToClient(row: Row): Client = {
     row match {
       case Row(id: Int, hostname: String, port: Int, Some(password: String), encoding: String, delay: Int, nickname: String, username: String, realname: String) =>
         Client(Some(id), hostname, port, Some(password), encoding, delay, nickname, username, realname)
@@ -25,7 +25,7 @@ class DatabaseClientDao extends ClientDao {
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("SELECT `hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients` WHERE `id` = {id}")
+      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients` WHERE `id` = {id}")
                       .on("id" -> id)().headOption.map(convertRowToClient)
     }
   }
@@ -36,12 +36,7 @@ class DatabaseClientDao extends ClientDao {
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients`")().collect {
-        case Row(id: Int, hostname: String, port: Int, Some(password: String), encoding: String, delay: Int, nickname: String, username: String, realname: String) =>
-          Client(Some(id), hostname, port, Some(password), encoding, delay, nickname, username, realname)
-        case Row(id: Int, hostname: String, port: Int, None, encoding: String, delay: Int, nickname: String, username: String, realname: String) =>
-          Client(Some(id), hostname, port, None, encoding, delay, nickname, username, realname)
-      }
+      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients`")().map(convertRowToClient)
     }
   }
 

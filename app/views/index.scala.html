@@ -1,27 +1,65 @@
-@(message: String)
+@(message: String, client: Option[net.mtgto.domain.Client])
 
 @stylesheets = {}
 @main("Welcome to Play 2.1", stylesheets) {
 <h1>@message</h1>
-<section id="clients">
+<section id="clients" class="container">
   <h2>クライアント</h2>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>名前</th>
-        <th>値</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>ID</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>ホスト名</td>
-        <td>localhost</td>
-      </tr>
-    </tbody>
-  </table>
+  @client match {
+    case Some(client) => {
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>名前</th>
+            <th>値</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ID</td>
+            <td>@client.identity.value</td>
+          </tr>
+          <tr>
+            <td>ホスト名</td>
+            <td>@client.hostname</td>
+          </tr>
+          <tr>
+            <td>ポート</td>
+            <td>@client.port</td>
+          </tr>
+          <tr>
+            <td>パスワード</td>
+            <td>@client.password.getOrElse("(なし)")</td>
+          </tr>
+          <tr>
+            <td>エンコーディング</td>
+            <td>@client.encoding</td>
+          </tr>
+          <tr>
+            <td>ディレイ</td>
+            <td>@client.delay</td>
+          </tr>
+          <tr>
+            <td>ニックネーム</td>
+            <td>@client.nickname</td>
+          </tr>
+          <tr>
+            <td>ユーザネーム</td>
+            <td>@client.username</td>
+          </tr>
+          <tr>
+            <td>リアルネーム</td>
+            <td>@client.realname</td>
+          </tr>
+        </tbody>
+      </table>
+    }
+    case None => {
+      クライアント指定してないよ
+    }
+  }
+</section>
+<section id="bots" class="container">
+  <h2>ボット</h2>
 </section>
 }

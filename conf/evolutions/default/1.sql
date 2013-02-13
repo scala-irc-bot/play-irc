@@ -18,6 +18,8 @@ CREATE TABLE `clients` (
   `realname` VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
 );
+INSERT INTO `clients` (`hostname`, `port`, `password`, `encoding`, `delay`, `nickname`, `username`, `realname`)
+VALUES ('localhost', '6667', NULL, 'UTF-8', '2000', 'bot', 'bot', 'mtgto');
 CREATE TABLE `channels` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(63) NOT NULL,
@@ -27,6 +29,7 @@ CREATE TABLE `bots` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(1023) NOT NULL,
   `config` TEXT,
+  `enabled` TINYINT NOT NULL,
   PRIMARY KEY (id)
 );
 

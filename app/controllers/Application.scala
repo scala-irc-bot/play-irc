@@ -88,7 +88,8 @@ object Application extends Controller with Secured {
   )
 
   def index = IsAuthenticated { user => implicit request =>
-    Ok(views.html.index("ようこそ、" + user.name + " さん"))
+    val client: Option[Client] = clientRepository.findHead
+    Ok(views.html.index("ようこそ、" + user.name + " さん", client))
   }
 
   def login = Action {
