@@ -5,8 +5,8 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import net.mtgto.domain.{User, UserRepository, Client, ClientRepository}
-import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao}
+import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository}
+import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao, ChannelDao, DatabaseChannelDao}
 
 import scalaz.Identity
 
@@ -77,6 +77,34 @@ object Application extends Controller with Secured {
     }
   }
 
+  protected[this] val channelRepository: ChannelRepository = new ChannelRepository {
+    private val channelDao: ChannelDao = new DatabaseChannelDao
+
+    def findAll: Seq[Channel] = {
+      channelDao.findAll.map {
+        infraChannel => Channel(Identity(infraChannel.id), infraChannel.name)
+      }
+    }
+
+    override def resolve(identifier: Identity[Int]): Channel = {
+      resolveOption(identifier).get
+    }
+
+    override def resolveOption(identifier: Identity[Int]): Option[Channel] = {
+      channelDao.findById(identifier.value).map {
+        infraChannel => Channel(Identity(infraChannel.id), infraChannel.name)
+      }
+    }
+
+    override def contains(identifier: Identity[Int]): Boolean = {
+      resolveOption(identifier).isDefined
+    }
+
+    override def contains(entity: Channel): Boolean = {
+      resolveOption(entity.identity).isDefined
+    }
+  }
+
   protected[this] val loginForm = Form(
     tuple(
       "name" -> nonEmptyText,
@@ -89,7 +117,8 @@ object Application extends Controller with Secured {
 
   def index = IsAuthenticated { user => implicit request =>
     val client: Option[Client] = clientRepository.findHead
-    Ok(views.html.index("ようこそ、" + user.name + " さん", client))
+    val channels: Seq[Channel] = channelRepository.findAll
+    Ok(views.html.index("ようこそ、" + user.name + " さん", client, channels))
   }
 
   def login = Action {

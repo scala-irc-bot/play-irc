@@ -1,4 +1,4 @@
-@(message: String, client: Option[net.mtgto.domain.Client])
+@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel])
 
 @stylesheets = {}
 @main("Welcome to Play 2.1", stylesheets) {
@@ -58,6 +58,25 @@
       クライアント指定してないよ
     }
   }
+</section>
+<section id="channels" class="container">
+  <h2>チャンネル</h2>
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(channel <- channels) {
+        <tr>
+          <td>@channel.identity</td>
+          <td>@channel.name</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </section>
 <section id="bots" class="container">
   <h2>ボット</h2>

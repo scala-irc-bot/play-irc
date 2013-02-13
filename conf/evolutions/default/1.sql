@@ -25,6 +25,8 @@ CREATE TABLE `channels` (
   `name` VARCHAR(63) NOT NULL,
   PRIMARY KEY (id)
 );
+INSERT INTO `channels` (`name`) VALUES ('#test');
+INSERT INTO `channels` (`name`) VALUES ('#mtgto');
 CREATE TABLE `bots` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(1023) NOT NULL,
