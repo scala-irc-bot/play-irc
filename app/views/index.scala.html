@@ -2,5 +2,26 @@
 
 @stylesheets = {}
 @main("Welcome to Play 2.1", stylesheets) {
-    @play20.welcome(message)
+<h1>@message</h1>
+<section id="clients">
+  <h2>クライアント</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>名前</th>
+        <th>値</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ID</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>ホスト名</td>
+        <td>localhost</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
 }

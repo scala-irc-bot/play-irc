@@ -5,8 +5,8 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import net.mtgto.domain.{User, UserRepository}
-import net.mtgto.infrastracture.{UserDao, DatabaseUserDao}
+import net.mtgto.domain.{User, UserRepository, Client, ClientRepository}
+import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao}
 
 import scalaz.Identity
 
@@ -14,12 +14,6 @@ object Application extends Controller with Secured {
   protected[this] val userRepository: UserRepository = new UserRepository {
     private val userDao: UserDao = new DatabaseUserDao
 
-    private def getDummyUser(identifier: Identity[Int]): User = {
-      new User {
-        override val identity = identifier
-        override val name = "admin"
-      }
-    }
     def findByNameAndPassword(name: String, password: String): Option[User] = {
       userDao.findByNameAndPassword(name, password).map {
         infraUser => User(Identity(infraUser.id), infraUser.name)
@@ -42,6 +36,44 @@ object Application extends Controller with Secured {
 
     override def contains(entity: User): Boolean = {
       resolveOption(entity.identity).isDefined
+    }
+  }
+
+  protected[this] val clientRepository: ClientRepository = new ClientRepository {
+    import net.mtgto.infrastracture.{Client => InfraClient}
+
+    private val clientDao: ClientDao = new DatabaseClientDao
+
+    private def convertInfraToDomain(infraClient: InfraClient): Client = {
+      Client(Identity(infraClient.id.get.toInt),
+             infraClient.hostname,
+             infraClient.port,
+             infraClient.password,
+             infraClient.encoding,
+             infraClient.delay,
+             infraClient.nickname,
+             infraClient.username,
+             infraClient.realname)
+    }
+
+    override def resolve(identifier: Identity[Int]): Client = {
+      resolveOption(identifier).get
+    }
+
+    override def resolveOption(identifier: Identity[Int]): Option[Client] = {
+      clientDao.findById(identifier.value).map(convertInfraToDomain)
+    }
+
+    override def contains(identifier: Identity[Int]): Boolean = {
+      resolveOption(identifier).isDefined
+    }
+
+    override def contains(entity: Client): Boolean = {
+      resolveOption(entity.identity).isDefined
+    }
+
+    override def findHead: Option[Client] = {
+      clientDao.findAll.headOption.map(convertInfraToDomain)
     }
   }
 
