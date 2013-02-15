@@ -59,6 +59,22 @@ object Application extends Controller with Secured {
         }
       )
   }
+
+  def connect = IsAuthenticated { user => implicit request =>
+    val client: Option[Client] = clientRepository.findHead
+    val channels: Seq[Channel] = channelRepository.findAll
+    val bots: Seq[Bot] = botRepository.findAll
+    client.map(ircBot.connect(_, channels, bots))
+    Ok(views.html.index("接続したよ", client, channels, bots))
+  }
+
+  def disconnect = IsAuthenticated { user => implicit request =>
+    val client: Option[Client] = clientRepository.findHead
+    val channels: Seq[Channel] = channelRepository.findAll
+    val bots: Seq[Bot] = botRepository.findAll
+    ircBot.disconnect
+    Ok(views.html.index("接続きったよ", client, channels, bots))
+  }
 }
 
 trait Secured {

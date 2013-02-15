@@ -16,19 +16,21 @@ object IrcBot {
     private var client: Option[IrcClient] = None
 
     override def connect(domainClient: Client, domainChannels: Seq[Channel], domainBots: Seq[Bot]) = {
-      client.map(_.disconnect)
+      client.map {
+        client => if (client.isConnected) client.disconnect
+      }
       client = Some(new DefaultIrcClient(
         new IrcConfig {
-          val hostname = domainClient.hostname
-          val port = domainClient.port
-          val password = domainClient.password
-          val encoding = domainClient.encoding
-          val delay = domainClient.delay
-          val nickname = domainClient.nickname
-          val username = domainClient.username
-          val realname = domainClient.realname
-          val channels = domainChannels.map(_.name).toArray
-          val bots = domainBots.map(bot => (bot.name -> Option.empty[BotConfig])).toArray
+          override val hostname = domainClient.hostname
+          override val port = domainClient.port
+          override val password = domainClient.password
+          override val encoding = domainClient.encoding
+          override val delay = domainClient.delay
+          override val nickname = domainClient.nickname
+          override val username = domainClient.username
+          override val realname = domainClient.realname
+          override val channels = domainChannels.map(_.name).toArray
+          override val bots = domainBots.map(bot => (bot.name -> Option.empty[BotConfig])).toArray
         }
       ))
       client.map(_.connect)

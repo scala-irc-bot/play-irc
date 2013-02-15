@@ -35,7 +35,7 @@ CREATE TABLE `bots` (
   `enabled` TINYINT NOT NULL,
   PRIMARY KEY (id)
 );
-INSERT INTO `bots` (`name`, `filename`, `config`, `enabled`) VALUES ('net.mtgto.irc.bot.test.TestBot', 'testbot.jar', 'hoge', '1');
+-- INSERT INTO `bots` (`name`, `filename`, `config`, `enabled`) VALUES ('net.mtgto.irc.bot.test.TestBot', 'testbot.jar', 'hoge', '1');
 # --- !Downs
 DROP TABLE `users`;
 DROP TABLE `clients`;
