@@ -30,11 +30,12 @@ INSERT INTO `channels` (`name`) VALUES ('#mtgto');
 CREATE TABLE `bots` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(1023) NOT NULL,
+  `filename` VARCHAR(255) NOT NULL,
   `config` TEXT,
   `enabled` TINYINT NOT NULL,
   PRIMARY KEY (id)
 );
-INSERT INTO `bots` (`name`, `config`, `enabled`) VALUES ('net.mtgto.irc.bot.test.TestBot', 'hoge', '1');
+INSERT INTO `bots` (`name`, `filename`, `config`, `enabled`) VALUES ('net.mtgto.irc.bot.test.TestBot', 'testbot.jar', 'hoge', '1');
 # --- !Downs
 DROP TABLE `users`;
 DROP TABLE `clients`;

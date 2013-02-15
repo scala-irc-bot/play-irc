@@ -110,7 +110,7 @@ object Application extends Controller with Secured {
 
     def findAll: Seq[Bot] = {
       botDao.findAll.map {
-        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.config, infraBot.enabled)
+        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
       }
     }
 
@@ -120,7 +120,7 @@ object Application extends Controller with Secured {
 
     override def resolveOption(identifier: Identity[Int]): Option[Bot] = {
       botDao.findById(identifier.value).map {
-        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.config, infraBot.enabled)
+        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
       }
     }
 
