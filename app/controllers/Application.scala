@@ -5,8 +5,8 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository}
-import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao, ChannelDao, DatabaseChannelDao}
+import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository, Bot, BotRepository}
+import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao, ChannelDao, DatabaseChannelDao, BotDao, DatabaseBotDao}
 
 import scalaz.Identity
 
@@ -105,6 +105,34 @@ object Application extends Controller with Secured {
     }
   }
 
+  protected[this] val botRepository: BotRepository = new BotRepository {
+    private val botDao: BotDao = new DatabaseBotDao
+
+    def findAll: Seq[Bot] = {
+      botDao.findAll.map {
+        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.config, infraBot.enabled)
+      }
+    }
+
+    override def resolve(identifier: Identity[Int]): Bot = {
+      resolveOption(identifier).get
+    }
+
+    override def resolveOption(identifier: Identity[Int]): Option[Bot] = {
+      botDao.findById(identifier.value).map {
+        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.config, infraBot.enabled)
+      }
+    }
+
+    override def contains(identifier: Identity[Int]): Boolean = {
+      resolveOption(identifier).isDefined
+    }
+
+    override def contains(entity: Bot): Boolean = {
+      resolveOption(entity.identity).isDefined
+    }
+  }
+
   protected[this] val loginForm = Form(
     tuple(
       "name" -> nonEmptyText,
@@ -118,7 +146,8 @@ object Application extends Controller with Secured {
   def index = IsAuthenticated { user => implicit request =>
     val client: Option[Client] = clientRepository.findHead
     val channels: Seq[Channel] = channelRepository.findAll
-    Ok(views.html.index("ようこそ、" + user.name + " さん", client, channels))
+    val bots: Seq[Bot] = botRepository.findAll
+    Ok(views.html.index("ようこそ、" + user.name + " さん", client, channels, bots))
   }
 
   def login = Action {

@@ -1,4 +1,4 @@
-@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel])
+@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])
 
 @stylesheets = {}
 @main("Welcome to Play 2.1", stylesheets) {
@@ -80,5 +80,25 @@
 </section>
 <section id="bots" class="container">
   <h2>ボット</h2>
+    <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+        <th>設定</th>
+        <th>有効</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(bot <- bots) {
+        <tr>
+          <td>@bot.identity</td>
+          <td>@bot.name</td>
+          <td>@if(bot.config.isEmpty){(なし)}else{(あり)}</td>
+          <td>@bot.enabled</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </section>
 }
