@@ -5,133 +5,18 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 
-import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository, Bot, BotRepository}
-import net.mtgto.infrastracture.{UserDao, DatabaseUserDao, ClientDao, DatabaseClientDao, ChannelDao, DatabaseChannelDao, BotDao, DatabaseBotDao}
+import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository, Bot, BotRepository, IrcBot}
 
 import scalaz.Identity
 
 object Application extends Controller with Secured {
-  protected[this] val userRepository: UserRepository = new UserRepository {
-    private val userDao: UserDao = new DatabaseUserDao
+  protected[this] val userRepository: UserRepository = UserRepository()
 
-    def findByNameAndPassword(name: String, password: String): Option[User] = {
-      userDao.findByNameAndPassword(name, password).map {
-        infraUser => User(Identity(infraUser.id), infraUser.name)
-      }
-    }
+  protected[this] val clientRepository: ClientRepository = ClientRepository()
 
-    override def resolve(identifier: Identity[Int]): User = {
-      resolveOption(identifier).get
-    }
+  protected[this] val channelRepository: ChannelRepository = ChannelRepository()
 
-    override def resolveOption(identifier: Identity[Int]): Option[User] = {
-      userDao.findById(identifier.value).map {
-        infraUser => User(Identity(infraUser.id), infraUser.name)
-      }
-    }
-
-    override def contains(identifier: Identity[Int]): Boolean = {
-      resolveOption(identifier).isDefined
-    }
-
-    override def contains(entity: User): Boolean = {
-      resolveOption(entity.identity).isDefined
-    }
-  }
-
-  protected[this] val clientRepository: ClientRepository = new ClientRepository {
-    import net.mtgto.infrastracture.{Client => InfraClient}
-
-    private val clientDao: ClientDao = new DatabaseClientDao
-
-    private def convertInfraToDomain(infraClient: InfraClient): Client = {
-      Client(Identity(infraClient.id.get.toInt),
-             infraClient.hostname,
-             infraClient.port,
-             infraClient.password,
-             infraClient.encoding,
-             infraClient.delay,
-             infraClient.nickname,
-             infraClient.username,
-             infraClient.realname)
-    }
-
-    override def resolve(identifier: Identity[Int]): Client = {
-      resolveOption(identifier).get
-    }
-
-    override def resolveOption(identifier: Identity[Int]): Option[Client] = {
-      clientDao.findById(identifier.value).map(convertInfraToDomain)
-    }
-
-    override def contains(identifier: Identity[Int]): Boolean = {
-      resolveOption(identifier).isDefined
-    }
-
-    override def contains(entity: Client): Boolean = {
-      resolveOption(entity.identity).isDefined
-    }
-
-    override def findHead: Option[Client] = {
-      clientDao.findAll.headOption.map(convertInfraToDomain)
-    }
-  }
-
-  protected[this] val channelRepository: ChannelRepository = new ChannelRepository {
-    private val channelDao: ChannelDao = new DatabaseChannelDao
-
-    def findAll: Seq[Channel] = {
-      channelDao.findAll.map {
-        infraChannel => Channel(Identity(infraChannel.id), infraChannel.name)
-      }
-    }
-
-    override def resolve(identifier: Identity[Int]): Channel = {
-      resolveOption(identifier).get
-    }
-
-    override def resolveOption(identifier: Identity[Int]): Option[Channel] = {
-      channelDao.findById(identifier.value).map {
-        infraChannel => Channel(Identity(infraChannel.id), infraChannel.name)
-      }
-    }
-
-    override def contains(identifier: Identity[Int]): Boolean = {
-      resolveOption(identifier).isDefined
-    }
-
-    override def contains(entity: Channel): Boolean = {
-      resolveOption(entity.identity).isDefined
-    }
-  }
-
-  protected[this] val botRepository: BotRepository = new BotRepository {
-    private val botDao: BotDao = new DatabaseBotDao
-
-    def findAll: Seq[Bot] = {
-      botDao.findAll.map {
-        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
-      }
-    }
-
-    override def resolve(identifier: Identity[Int]): Bot = {
-      resolveOption(identifier).get
-    }
-
-    override def resolveOption(identifier: Identity[Int]): Option[Bot] = {
-      botDao.findById(identifier.value).map {
-        infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
-      }
-    }
-
-    override def contains(identifier: Identity[Int]): Boolean = {
-      resolveOption(identifier).isDefined
-    }
-
-    override def contains(entity: Bot): Boolean = {
-      resolveOption(entity.identity).isDefined
-    }
-  }
+  protected[this] val botRepository: BotRepository = BotRepository()
 
   protected[this] val loginForm = Form(
     tuple(
@@ -142,6 +27,8 @@ object Application extends Controller with Secured {
       case _ => false
     })
   )
+
+  val ircBot: IrcBot = IrcBot()
 
   def index = IsAuthenticated { user => implicit request =>
     val client: Option[Client] = clientRepository.findHead
