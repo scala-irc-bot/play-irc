@@ -64,16 +64,34 @@ object Application extends Controller with Secured {
     val client: Option[Client] = clientRepository.findHead
     val channels: Seq[Channel] = channelRepository.findAll
     val bots: Seq[Bot] = botRepository.findAll
-    client.map(ircBot.connect(_, channels, bots))
-    Ok(views.html.index("接続したよ", client, channels, bots))
+    (ircBot.isConnected, client) match {
+      case (false, Some(client)) =>
+        ircBot.connect(client, channels, bots)
+        Redirect(routes.Application.index).flashing(
+          "success" -> "接続したよ"
+        )
+      case (true, _) =>
+        Redirect(routes.Application.index).flashing(
+          "error" -> "すでに接続してるよ"
+        )
+      case _ =>
+        Redirect(routes.Application.index).flashing(
+          "error" -> "クライアントの設定をしてないよ"
+        )
+    }
   }
 
   def disconnect = IsAuthenticated { user => implicit request =>
-    val client: Option[Client] = clientRepository.findHead
-    val channels: Seq[Channel] = channelRepository.findAll
-    val bots: Seq[Bot] = botRepository.findAll
-    ircBot.disconnect
-    Ok(views.html.index("接続きったよ", client, channels, bots))
+    if (ircBot.isConnected) {
+      ircBot.disconnect
+      Redirect(routes.Application.index).flashing(
+        "success" -> "接続きったよ"
+      )
+    } else {
+      Redirect(routes.Application.index).flashing(
+        "error" -> "接続してないよ"
+      )
+    }
   }
 }
 

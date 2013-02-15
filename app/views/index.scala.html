@@ -1,7 +1,19 @@
-@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])
+@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])(implicit flash: Flash)
 
 @stylesheets = {}
 @main("Welcome to Play 2.1", stylesheets) {
+@if(flash.get("success").isDefined) {
+  <div class="alert alert-success">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    @flash.get("success")
+  </div>
+}
+@if(flash.get("error").isDefined) {
+  <div class="alert alert-error">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    @flash.get("error")
+  </div>
+}
 <h1>@message</h1>
 <section id="clients" class="container">
   <h2>クライアント</h2>
