@@ -4,7 +4,7 @@
 @import helper.twitterBootstrap._
 
 @stylesheets = {}
-@main("IRC bot", stylesheets) {
+@main("新規ボット", stylesheets) {
   <h2>新規ボット</h2>
   @helper.form(action = net.mtgto.controllers.routes.BotController.create, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
     @inputText(createForm("name"), '_label -> "ボットのFQCN", 'placeholder -> "ボットのFQCN")

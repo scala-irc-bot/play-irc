@@ -7,7 +7,7 @@ import play.api.data.Forms._
 
 import java.io.File
 
-import net.mtgto.domain.{BotRepository, UserRepository, BotFactory}
+import net.mtgto.domain.{Bot, BotRepository, UserRepository, BotFactory}
 
 import scalaz.Identity
 
@@ -67,7 +67,37 @@ object BotController extends Controller with Secured {
   }
 
   def edit(id: Int) = IsAuthenticated(parse.multipartFormData) { user => implicit request =>
-    Redirect(routes.Application.index).flashing("error" -> "まだ実装してないよ")
+    editForm.bindFromRequest.fold(
+      formWithErrors =>
+        BadRequest(views.html.bots.edit(id, formWithErrors)).flashing("error" -> "入力項目にエラーがあります"),
+      nameAndConfig => {
+        botRepository.resolveOption(Identity(id)) match {
+          case Some(bot) => {
+            nameAndConfig match {
+              case (name, config) => {
+                request.body.file("file") match {
+                  case Some(file) => {
+                    new File("bots", bot.filename).delete
+                    val filename = file.filename
+                    // 先に移動先に同盟のファイルが有るかどうかを確認する（いまは同名ファイルがあれば失敗する）
+                    Logger.info("moving uploaded file to " + new File("bots", filename))
+                    file.ref.moveTo(new File("bots", filename))
+                    botRepository.store(Bot(bot.identity, name, filename, Option(config).filter(_.nonEmpty), bot.enabled))
+                  }
+                  case _ => {
+                    botRepository.store(Bot(bot.identity, name, bot.filename, Option(config).filter(_.nonEmpty), bot.enabled))
+                  }
+                }
+                Redirect(routes.Application.index).flashing(
+                  "success" -> "ボットの情報を更新しました")
+              }
+            }
+          }
+          case _ =>
+            Redirect(routes.Application.index).flashing("error" -> "編集しようとしたボットが見つかりません")
+        }
+      }
+    )
   }
 
   def enable(id: Int) = IsAuthenticated { user => implicit request =>
