@@ -1,12 +1,12 @@
 package net.mtgto.domain
 
-import net.mtgto.infrastracture.{BotDao, DatabaseBotDao}
+import net.mtgto.infrastracture.{BotDao, DatabaseBotDao, Bot => InfraBot}
 
-import org.sisioh.dddbase.core.EntityResolver
+import org.sisioh.dddbase.core.{Repository, EntityNotFoundException}
 
 import scalaz.Identity
 
-trait BotRepository extends EntityResolver[Bot, Int] {
+trait BotRepository extends Repository[Bot, Int] {
   def findAll: Seq[Bot]
 }
 
@@ -35,7 +35,22 @@ object BotRepository {
     }
 
     override def contains(entity: Bot): Boolean = {
-      resolveOption(entity.identity).isDefined
+      contains(entity.identity)
+    }
+
+    override def store(entity: Bot): Unit = {
+      val infraBot = InfraBot(entity.identity.value, entity.name, entity.filename, entity.config, entity.enabled)
+      botDao.save(infraBot)
+    }
+
+    override def delete(identity: Identity[Int]): Unit = {
+      if (botDao.delete(identity.value) == 0) {
+        throw new EntityNotFoundException
+      }
+    }
+
+    override def delete(entity: Bot): Unit = {
+      delete(entity.identity)
     }
   }
 }

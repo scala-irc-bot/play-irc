@@ -12,6 +12,8 @@ GET     /disconnect                  net.mtgto.controllers.Application.disconnec
 
 GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
 POST    /bots/create                 net.mtgto.controllers.BotController.create
+GET     /bots/:id/disable            net.mtgto.controllers.BotController.disable(id: Int)
+GET     /bots/:id/enable             net.mtgto.controllers.BotController.enable(id: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

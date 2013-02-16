@@ -11,6 +11,9 @@ trait Bot extends Entity[Int] {
   val enabled: Boolean
 
   override def toString: String = Seq(identity, name, filename, config, enabled).mkString("Bot(", ", ",")")
+
+  def toEnable: Bot
+  def toDisable: Bot
 }
 
 object Bot {
@@ -21,6 +24,9 @@ object Bot {
       override val filename = argFilename
       override val config = argConfig
       override val enabled = argEnabled
+
+      override def toEnable: Bot = Bot(identity, name, filename, config, true)
+      override def toDisable: Bot = Bot(identity, name, filename, config, false)
     }
   }
 }

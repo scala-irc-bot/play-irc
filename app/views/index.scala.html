@@ -97,7 +97,13 @@
           <td>@bot.identity</td>
           <td>@bot.name</td>
           <td>@if(bot.config.isEmpty){(なし)}else{(あり)}</td>
-          <td>@bot.enabled</td>
+          <td>
+          @if(bot.enabled) {
+            <a href="@net.mtgto.controllers.routes.BotController.disable(bot.identity.value)">有効</a>
+          } else {
+            <a href="@net.mtgto.controllers.routes.BotController.enable(bot.identity.value)">無効</a>
+          }
+          </td>
         </tr>
       }
     </tbody>
