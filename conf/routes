@@ -12,6 +12,8 @@ GET     /disconnect                  net.mtgto.controllers.Application.disconnec
 
 GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
 POST    /bots/create                 net.mtgto.controllers.BotController.create
+GET     /bots/:id/edit               net.mtgto.controllers.BotController.showEditView(id: Int)
+POST    /bots/:id/edit               net.mtgto.controllers.BotController.edit(id: Int)
 GET     /bots/:id/disable            net.mtgto.controllers.BotController.disable(id: Int)
 GET     /bots/:id/enable             net.mtgto.controllers.BotController.enable(id: Int)
 

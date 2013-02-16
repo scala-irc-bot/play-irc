@@ -23,31 +23,51 @@ object BotController extends Controller with Secured {
     )
   )
 
+  protected[this] val editForm = Form(
+    tuple(
+      "name" -> nonEmptyText,
+      "config" -> text
+    )
+  )
+
   def showCreateView = IsAuthenticated { user => implicit request =>
     Ok(views.html.bots.create(createForm))
   }
 
   def create = IsAuthenticated(parse.multipartFormData) { user => implicit request =>
     createForm.bindFromRequest.fold(
-        formWithErrors =>
-          BadRequest(views.html.bots.create(formWithErrors)).flashing("error" -> "入力項目にエラーがあります"),
-        nameAndConfig => {
-          (request.body.file("file"), nameAndConfig) match {
-            case (Some(file), (name, config)) => {
-              val filename = file.filename
-              // 先に移動先に同盟のファイルが有るかどうかを確認する（いまは同名ファイルがあれば失敗する）
-              val bot = BotFactory(name, filename, Option(config).filter(_.nonEmpty), true)
-              Logger.info("moving uploaded file to " + new File("bots", filename))
-              file.ref.moveTo(new File("bots", filename))
-              Redirect(routes.Application.index).flashing(
-                "success" -> ("name = " + name + ", config = " + config + ", file = " + request.body.file("file")))
-            }
-            case (None, _) => {
-              Redirect(net.mtgto.controllers.routes.BotController.create).flashing("error" -> "ファイルを指定してください")
-            }
+      formWithErrors =>
+        BadRequest(views.html.bots.create(formWithErrors)).flashing("error" -> "入力項目にエラーがあります"),
+      nameAndConfig => {
+        (request.body.file("file"), nameAndConfig) match {
+          case (Some(file), (name, config)) => {
+            val filename = file.filename
+            // 先に移動先に同盟のファイルが有るかどうかを確認する（いまは同名ファイルがあれば失敗する）
+            val bot = BotFactory(name, filename, Option(config).filter(_.nonEmpty), true)
+            Logger.info("moving uploaded file to " + new File("bots", filename))
+            file.ref.moveTo(new File("bots", filename))
+            Redirect(routes.Application.index).flashing(
+              "success" -> ("name = " + name + ", config = " + config + ", file = " + request.body.file("file")))
+          }
+          case (None, _) => {
+            Redirect(net.mtgto.controllers.routes.BotController.create).flashing("error" -> "ファイルを指定してください")
           }
         }
+      }
     )
+  }
+
+  def showEditView(id: Int) = IsAuthenticated { user => implicit request =>
+    botRepository.resolveOption(Identity(id)) match {
+      case Some(bot) =>
+        Ok(views.html.bots.edit(id, editForm.fill((bot.name, bot.config.getOrElse("")))))
+      case _ =>
+        Redirect(routes.Application.index).flashing("error" -> "編集しようとしたボットが見つかりません")
+    }
+  }
+
+  def edit(id: Int) = IsAuthenticated(parse.multipartFormData) { user => implicit request =>
+    Redirect(routes.Application.index).flashing("error" -> "まだ実装してないよ")
   }
 
   def enable(id: Int) = IsAuthenticated { user => implicit request =>

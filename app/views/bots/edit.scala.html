@@ -1,0 +1,20 @@
+@(id: Int, createForm: Form[(String, String)])(implicit flash: Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@stylesheets = {}
+@main("IRC bot", stylesheets) {
+  <h2>ボット編集</h2>
+  @helper.form(action = net.mtgto.controllers.routes.BotController.edit(id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+    @inputText(createForm("name"), '_label -> "ボットのFQCN", 'placeholder -> "ボットのFQCN")
+    @textarea(createForm("config"),  '_label -> "設定", 'rows -> 10, '_placeholder -> "設定")
+    <div class="clearfix" id="config_field">
+        <label for="config">本体ファイル (更新しない場合は選択しないでください)</label>
+        <div class="input">
+            <input type="file" name="file"></input>
+        </div>
+    </div>
+    <button class="btn btn-large btn-primary" type="submit">更新</button>
+  }
+}
