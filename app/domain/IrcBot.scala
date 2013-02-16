@@ -1,5 +1,7 @@
 package net.mtgto.domain
 
+import com.twitter.util.Eval
+
 import net.mtgto.irc.{Client => IrcClient, DefaultClient => DefaultIrcClient, Config => IrcConfig}
 import net.mtgto.irc.config.BotConfig
 
@@ -30,7 +32,11 @@ object IrcBot {
           override val username = domainClient.username
           override val realname = domainClient.realname
           override val channels = domainChannels.map(_.name).toArray
-          override val bots = domainBots.map(bot => (bot.name -> Option.empty[BotConfig])).toArray
+          override val bots = domainBots.map {
+            bot =>
+              val botConfig: Option[BotConfig] = bot.config.map(Eval(_))
+              bot.name -> Option.empty[BotConfig]
+          }.toArray
         }
       ))
       client.map(_.connect)

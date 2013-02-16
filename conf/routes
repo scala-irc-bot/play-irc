@@ -10,5 +10,8 @@ POST    /authenticate                net.mtgto.controllers.Application.authentic
 GET     /connect                     net.mtgto.controllers.Application.connect
 GET     /disconnect                  net.mtgto.controllers.Application.disconnect
 
+GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
+POST    /bots/create                 net.mtgto.controllers.BotController.create
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

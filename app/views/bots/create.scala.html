@@ -1,0 +1,14 @@
+@(createForm: Form[(String, String)])(implicit flash: Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@stylesheets = {}
+@main("IRC bot", stylesheets) {
+  <h2>新規ボット</h2>
+  @helper.form(action = net.mtgto.controllers.routes.BotController.create, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+    @inputText(createForm("name"), '_label -> "ボットのFQCN", 'placeholder -> "ボットのFQCN")
+    @textarea(createForm("config"),  '_label -> "設定", 'rows -> 10, '_placeholder -> "設定")
+    <button class="btn btn-large btn-primary" type="submit">追加</button>
+  }
+}

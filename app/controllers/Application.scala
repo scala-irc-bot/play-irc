@@ -37,7 +37,7 @@ object Application extends Controller with Secured {
     Ok(views.html.index("ようこそ、" + user.name + " さん", client, channels, bots))
   }
 
-  def login = Action {
+  def login = Action { implicit request =>
     Ok(views.html.users.login(loginForm))
   }
 
@@ -107,5 +107,9 @@ trait Secured {
 
   def IsAuthenticated(f: => User => Request[AnyContent] => Result) = Security.Authenticated(getUser, onUnauthorized) { user =>
     Action(request => f(user)(request))
+  }
+
+  def IsAuthenticated[A](bodyParser: BodyParser[A])(f: => User => Request[A] => Result) = Security.Authenticated(getUser, onUnauthorized) { user =>
+    Action(bodyParser)(request => f(user)(request))
   }
 }
