@@ -4,6 +4,10 @@ trait ChannelDao {
   def findById(id: Int): Option[Channel]
   def findAll: Seq[Channel]
   def save(name: String): Option[Channel]
+  /**
+   * return the number of deleted rows
+   */
+  def delete(id: Int): Int
 }
 
 class DatabaseChannelDao extends ChannelDao {
@@ -40,6 +44,18 @@ class DatabaseChannelDao extends ChannelDao {
       SQL("INSERT INTO `channels` (`name`) VALUES ({name})").on('name -> name).executeInsert().map { id =>
         Channel(id.toInt, name)
       }
+    }
+  }
+
+  override def delete(id: Int): Int = {
+    import anorm._
+    import anorm.SqlParser._
+    import play.api.db.DB
+    import play.api.Play.current
+    DB.withConnection{ implicit c =>
+      SQL("DELETE FROM `channels` WHERE `id` = {id}")
+        .on("id" -> id)
+        .executeUpdate()
     }
   }
 }

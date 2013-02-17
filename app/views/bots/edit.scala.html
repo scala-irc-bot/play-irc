@@ -3,8 +3,9 @@
 @import helper._
 @import helper.twitterBootstrap._
 
-@stylesheets = {}
-@main("ボット編集", stylesheets) {
+@headers = {}
+@footers = {}
+@main("ボット編集", headers, footers) {
   <h2>ボット編集</h2>
   @helper.form(action = net.mtgto.controllers.routes.BotController.edit(id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
     @inputText(createForm("name"), '_label -> "ボットのFQCN", 'placeholder -> "ボットのFQCN")

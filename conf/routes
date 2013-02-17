@@ -10,6 +10,8 @@ POST    /authenticate                net.mtgto.controllers.Application.authentic
 GET     /connect                     net.mtgto.controllers.Application.connect
 GET     /disconnect                  net.mtgto.controllers.Application.disconnect
 
+POST    /channels/create             net.mtgto.controllers.ChannelController.create
+
 GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
 POST    /bots/create                 net.mtgto.controllers.BotController.create
 GET     /bots/:id/edit               net.mtgto.controllers.BotController.showEditView(id: Int)
