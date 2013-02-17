@@ -47,7 +47,7 @@ class DatabaseClientDao extends ClientDao {
     import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("""
-          INSERT INTO `client` (`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname`)
+          INSERT INTO `clients` (`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname`)
           VALUES ({hostname}, {port}, {password}, {encoding}, {delay}, {nickname}, {username}, {realname})
           """)
           .on('hostname -> client.hostname,
@@ -55,7 +55,7 @@ class DatabaseClientDao extends ClientDao {
               'password -> client.password,
               'encoding -> client.encoding,
               'delay -> client.delay,
-              'nickanme -> client.nickname,
+              'nickname -> client.nickname,
               'username -> client.username,
               'realname -> client.realname).executeInsert()
       }

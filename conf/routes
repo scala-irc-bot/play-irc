@@ -10,6 +10,9 @@ POST    /authenticate                net.mtgto.controllers.Application.authentic
 GET     /connect                     net.mtgto.controllers.Application.connect
 GET     /disconnect                  net.mtgto.controllers.Application.disconnect
 
+GET     /clients/create              net.mtgto.controllers.ClientController.showCreateView
+POST    /clients/create              net.mtgto.controllers.ClientController.create
+
 POST    /channels/create             net.mtgto.controllers.ChannelController.create
 
 GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
