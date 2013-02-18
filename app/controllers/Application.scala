@@ -55,7 +55,7 @@ object Application extends Controller with Secured {
             case (name, password) =>
               userRepository.findByNameAndPassword(name, password).get
           }
-          Redirect(routes.Application.login).withSession("userId" -> user.identity.value.toString)
+          Redirect(routes.Application.index).withSession("userId" -> user.identity.value.toString)
         }
       )
   }
