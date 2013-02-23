@@ -3,6 +3,7 @@ package net.mtgto.infrastracture
 trait UserDao {
   def findById(id: Int): Option[User]
   def findByNameAndPassword(name: String, password: String): Option[User]
+  def save(name: String, password: String): Option[User]
 }
 
 class DatabaseUserDao extends UserDao {
@@ -27,6 +28,18 @@ class DatabaseUserDao extends UserDao {
       SQL("SELECT `id` FROM `users` WHERE `name` = {name} AND `password` = {password}").on("name" -> name, "password" -> password).as(scalar[Int].singleOpt).map {
         id => User(id, name)
       }
+    }
+  }
+
+  override def save(name: String, password: String): Option[User] = {
+    import anorm._
+    import anorm.SqlParser._
+    import play.api.db.DB
+    import play.api.Play.current
+    DB.withConnection{ implicit c =>
+      SQL("INSERT INTO `users` (`name`,`password`) VALUES ({name},{password})")
+        .on("name" -> name, "password" -> password).executeInsert()
+        .map(id => User(id.toInt, name))
     }
   }
 }

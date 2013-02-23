@@ -4,9 +4,9 @@
 
 # Home page
 GET     /                            net.mtgto.controllers.Application.index
-GET     /login                       net.mtgto.controllers.Application.login
-GET     /logout                      net.mtgto.controllers.Application.logout
-POST    /authenticate                net.mtgto.controllers.Application.authenticate
+GET     /login                       net.mtgto.controllers.UserController.login
+GET     /logout                      net.mtgto.controllers.UserController.logout
+POST    /authenticate                net.mtgto.controllers.UserController.authenticate
 GET     /connect                     net.mtgto.controllers.Application.connect
 GET     /disconnect                  net.mtgto.controllers.Application.disconnect
 

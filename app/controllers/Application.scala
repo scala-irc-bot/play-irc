@@ -37,29 +37,6 @@ object Application extends Controller with Secured {
     Ok(views.html.index("ようこそ、" + user.name + " さん", client, channels, bots))
   }
 
-  def login = Action { implicit request =>
-    Ok(views.html.users.login(loginForm))
-  }
-
-  def logout = IsAuthenticated { user => implicit request =>
-    Redirect(routes.Application.index).withNewSession
-  }
-
-  def authenticate = Action {
-    implicit request =>
-      loginForm.bindFromRequest.fold(
-        formWithErrors =>
-          BadRequest(views.html.users.login(formWithErrors)),
-        userNameAndPassword => {
-          val user: User = userNameAndPassword match {
-            case (name, password) =>
-              userRepository.findByNameAndPassword(name, password).get
-          }
-          Redirect(routes.Application.index).withSession("userId" -> user.identity.value.toString)
-        }
-      )
-  }
-
   def connect = IsAuthenticated { user => implicit request =>
     val client: Option[Client] = clientRepository.findHead
     val channels: Seq[Channel] = channelRepository.findAll
@@ -103,7 +80,7 @@ trait Secured {
       userRepository.resolveOption(Identity(userId.toInt)))
   }
 
-  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login)
+  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.UserController.login)
 
   def IsAuthenticated(f: => User => Request[AnyContent] => Result) = Security.Authenticated(getUser, onUnauthorized) { user =>
     Action(request => f(user)(request))
