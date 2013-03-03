@@ -43,16 +43,17 @@ object BotController extends Controller with Secured {
         BadRequest(views.html.bots.create(formWithErrors)).flashing("error" -> "入力項目にエラーがあります"),
       nameAndConfig => {
         (request.body.file("file"), nameAndConfig) match {
-          case (Some(file), (name, config)) => {
+          case (Some(file), (name, config)) if file.filename.length > 0 => {
             val filename = file.filename
             // 先に移動先に同盟のファイルが有るかどうかを確認する（いまは同名ファイルがあれば失敗する）
             val bot = BotFactory(name, filename, Option(config).filter(_.nonEmpty), true)
-            Logger.info("moving uploaded file to " + new File("bots", filename))
+            Logger.info("moving uploaded file " + filename + " to " + new File("bots", filename))
             file.ref.moveTo(new File("bots", filename))
+            botRepository.store(bot)
             Redirect(routes.Application.index).flashing(
-              "success" -> ("name = " + name + ", config = " + config + ", file = " + request.body.file("file")))
+              "success" -> ("ボットを追加しました"))
           }
-          case (None, _) => {
+          case (_, _) => {
             Redirect(net.mtgto.controllers.routes.BotController.create).flashing("error" -> "ファイルを指定してください")
           }
         }
@@ -79,11 +80,11 @@ object BotController extends Controller with Secured {
             nameAndConfig match {
               case (name, config) => {
                 request.body.file("file") match {
-                  case Some(file) => {
+                  case Some(file) if file.filename.length > 0 => {
                     new File("bots", bot.filename).delete
                     val filename = file.filename
                     // 先に移動先に同盟のファイルが有るかどうかを確認する（いまは同名ファイルがあれば失敗する）
-                    Logger.info("moving uploaded file to " + new File("bots", filename))
+                    Logger.info("moving uploaded file " + filename + " to " + new File("bots", filename))
                     file.ref.moveTo(new File("bots", filename))
                     botRepository.store(Bot(bot.identity, name, filename, Option(config).filter(_.nonEmpty), bot.enabled))
                   }

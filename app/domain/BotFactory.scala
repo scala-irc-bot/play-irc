@@ -1,20 +1,14 @@
 package net.mtgto.domain
 
-import net.mtgto.infrastracture.{BotDao, DatabaseBotDao}
-
 import scalaz.Identity
 import java.util.UUID
 
 trait BotFactory {
-	def apply(name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot]
+	def apply(name: String, filename: String, config: Option[String], enabled: Boolean): Bot
 }
 
 object BotFactory extends BotFactory {
-  private val botDao: BotDao = new DatabaseBotDao
-
-  override def apply(name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot] = {
-    botDao.save(UUID.randomUUID, name, filename, config, enabled).map {
-      infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
-    }
+  override def apply(name: String, filename: String, config: Option[String], enabled: Boolean): Bot = {
+    Bot(Identity(UUID.randomUUID), name, filename, config, enabled)
 	}
 }

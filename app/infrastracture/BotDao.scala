@@ -6,8 +6,7 @@ import java.util.UUID
 trait BotDao {
   def findById(id: UUID): Option[Bot]
   def findAll: Seq[Bot]
-  def save(id: UUID, name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot]
-  def save(bot: Bot): Option[Bot]
+  def save(bot: Bot): Unit
   /**
    * return the number of deleted rows
    */
@@ -44,30 +43,28 @@ class DatabaseBotDao extends BotDao {
     }
   }
 
-  override def save(id: UUID, name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot] = {
+  override def save(bot: Bot): Unit = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("INSERT INTO `bots` (`id`, `name`,`filename`,`config`,`enabled`) VALUES ({id},{name},{filename},{config},{enabled})")
-        .on('id -> id, 'name -> name, 'filename -> filename, 'config -> config, 'enabled -> (if (enabled) "1" else "0")).executeInsert()
-        .map(_ => Bot(id, name, filename, config, enabled))
-    }
-  }
-
-  override def save(bot: Bot): Option[Bot] = {
-    import anorm._
-    import anorm.SqlParser._
-    import play.api.db.DB
-    import play.api.Play.current
-    DB.withConnection{ implicit c =>
-      SQL("UPDATE `bots` SET `name`={name},`filename`={filename},`config`={config},`enabled`={enabled} WHERE `id` = {id}")
-        .on("name" -> bot.name, "filename" -> bot.filename, "config" -> bot.config, "enabled" -> (if (bot.enabled) "1" else "0"), "id" -> bot.id)
-        .executeUpdate() match {
-          case 1 => Some(bot)
-          case _ => None
-        }
+      val rowCount =
+        SQL("UPDATE `bots` SET `name` = {name}, `filename` = {filename}, `config` = {config}, `enabled` = {enabled} WHERE `id` = {id}")
+          .on('id -> bot.id,
+              'name -> bot.name,
+              'filename -> bot.filename,
+              'config -> bot.config,
+              'enabled -> (if (bot.enabled) "1" else "0"))
+          .executeUpdate()
+      if (rowCount == 0)
+        SQL("INSERT INTO `bots` (`id`, `name`,`filename`,`config`,`enabled`) VALUES ({id},{name},{filename},{config},{enabled})")
+          .on('id -> bot.id,
+              'name -> bot.name,
+              'filename -> bot.filename,
+              'config -> bot.config,
+              'enabled -> (if (bot.enabled) "1" else "0"))
+          .executeInsert()
     }
   }
 
