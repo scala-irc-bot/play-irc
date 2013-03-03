@@ -37,8 +37,12 @@ class DatabaseUserDao extends UserDao {
 
   override def save(id: UUID, name: String, password: String): Unit = {
     DB.withConnection{ implicit c =>
-      SQL("INSERT INTO `users` (`id`, `name`,`password`) VALUES ({id},{name},{password})")
-        .on('id -> id, 'name -> name, 'password -> password).executeInsert()
+      val rowCount =
+        SQL("UPDATE `users` SET `name` = {name}, `password` = {password} WHERE `id` = {id}")
+          .on('id -> id, 'name -> name, 'password -> password).executeUpdate()
+      if (rowCount == 0)
+        SQL("INSERT INTO `users` (`id`, `name`,`password`) VALUES ({id},{name},{password})")
+          .on('id -> id, 'name -> name, 'password -> password).executeInsert()
     }
   }
 
