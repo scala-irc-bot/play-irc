@@ -12,7 +12,7 @@ object ApplicationBuild extends Build {
     jdbc,
     anorm,
     "org.sisioh" %% "scala-dddbase-core" % "0.0.1",
-    "net.mtgto" %% "scala-irc-bot" % "0.2.0-SNAPSHOT"
+    "net.mtgto" %% "scala-irc-bot" % "0.2.0"
   )
 
   def customLessEntryPoints(base: File): PathFinder = (
