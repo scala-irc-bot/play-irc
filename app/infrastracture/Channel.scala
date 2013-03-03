@@ -1,3 +1,5 @@
 package net.mtgto.infrastracture
 
-case class Channel(id: Int, name: String)
+import java.util.UUID
+
+case class Channel(id: UUID, name: String)

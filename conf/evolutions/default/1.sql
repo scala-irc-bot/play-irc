@@ -22,7 +22,7 @@ INSERT INTO `clients` (`id`, `hostname`, `port`, `password`, `encoding`, `messag
 VALUES ('97ce3550-0501-4a89-89fc-50b8c279c02b', 'localhost', '6667', NULL, 'UTF-8', '2000', '60000', 'bot', 'bot', 'mtgto');
 CREATE TABLE `channels` (
   `id` CHAR(36) NOT NULL,
-  `name` VARCHAR(63) NOT NULL,
+  `name` VARCHAR(63) NOT NULL UNIQUE,
   PRIMARY KEY (id)
 );
 INSERT INTO `channels` (`id`, `name`) VALUES ('78835103-25ed-4df5-a497-ce1b8c8d707c', '#test');

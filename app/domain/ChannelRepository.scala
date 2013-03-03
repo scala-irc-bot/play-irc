@@ -3,10 +3,10 @@ package net.mtgto.domain
 import net.mtgto.infrastracture.{ChannelDao, DatabaseChannelDao}
 
 import org.sisioh.dddbase.core.EntityResolver
-
 import scalaz.Identity
+import java.util.UUID
 
-trait ChannelRepository extends EntityResolver[Channel, Int] {
+trait ChannelRepository extends EntityResolver[Channel, UUID] {
   def findAll: Seq[Channel]
 }
 
@@ -20,17 +20,17 @@ object ChannelRepository {
       }
     }
 
-    override def resolve(identifier: Identity[Int]): Channel = {
+    override def resolve(identifier: Identity[UUID]): Channel = {
       resolveOption(identifier).get
     }
 
-    override def resolveOption(identifier: Identity[Int]): Option[Channel] = {
+    override def resolveOption(identifier: Identity[UUID]): Option[Channel] = {
       channelDao.findById(identifier.value).map {
         infraChannel => Channel(Identity(infraChannel.id), infraChannel.name)
       }
     }
 
-    override def contains(identifier: Identity[Int]): Boolean = {
+    override def contains(identifier: Identity[UUID]): Boolean = {
       resolveOption(identifier).isDefined
     }
 

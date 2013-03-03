@@ -1,17 +1,19 @@
 package net.mtgto.infrastracture
 
+import java.util.UUID
+
 trait ChannelDao {
-  def findById(id: Int): Option[Channel]
+  def findById(id: UUID): Option[Channel]
   def findAll: Seq[Channel]
-  def save(name: String): Option[Channel]
+  def save(id: UUID, name: String): Option[Channel]
   /**
    * return the number of deleted rows
    */
-  def delete(id: Int): Int
+  def delete(id: UUID): Int
 }
 
 class DatabaseChannelDao extends ChannelDao {
-  override def findById(id: Int): Option[Channel] = {
+  override def findById(id: UUID): Option[Channel] = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
@@ -30,24 +32,25 @@ class DatabaseChannelDao extends ChannelDao {
     import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("SELECT `id`,`name` FROM `channels`")().collect {
-        case Row(id: Int, name: String) => Channel(id, name)
+        case Row(id: String, name: String) => Channel(UUID.fromString(id), name)
       }.toList
     }
   }
 
-  override def save(name: String): Option[Channel] = {
+  override def save(id: UUID, name: String): Option[Channel] = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("INSERT INTO `channels` (`name`) VALUES ({name})").on('name -> name).executeInsert().map { id =>
-        Channel(id.toInt, name)
+      SQL("INSERT INTO `channels` (`id`, `name`) VALUES ({id},{name})")
+        .on('id -> id, 'name -> name).executeInsert().map { _ =>
+        Channel(id, name)
       }
     }
   }
 
-  override def delete(id: Int): Int = {
+  override def delete(id: UUID): Int = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB

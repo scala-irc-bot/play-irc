@@ -55,10 +55,6 @@
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
-              <td>@client.identity.value</td>
-            </tr>
-            <tr>
               <td>ホスト名</td>
               <td>@client.hostname</td>
             </tr>
@@ -110,14 +106,12 @@
     <table class="table table-condensed table-striped">
       <thead>
         <tr>
-          <th>ID</th>
           <th>名前</th>
         </tr>
       </thead>
       <tbody>
         @for(channel <- channels) {
           <tr>
-            <td>@channel.identity</td>
             <td>@channel.name</td>
           </tr>
         }
@@ -130,7 +124,6 @@
       <table class="table table-condensed table-striped">
       <thead>
         <tr>
-          <th>ID</th>
           <th>名前</th>
           <th>設定</th>
           <th>有効</th>
@@ -140,7 +133,6 @@
       <tbody>
         @for(bot <- bots) {
           <tr>
-            <td>@bot.identity</td>
             <td>@bot.name</td>
             <td>@if(bot.config.isEmpty){(なし)}else{(あり)}</td>
             <td>
