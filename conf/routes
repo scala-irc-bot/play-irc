@@ -12,6 +12,8 @@ GET     /disconnect                  net.mtgto.controllers.Application.disconnec
 
 GET     /clients/create              net.mtgto.controllers.ClientController.showCreateView
 POST    /clients/create              net.mtgto.controllers.ClientController.create
+GET     /clients/:id/edit            net.mtgto.controllers.ClientController.showEditView(id)
+POST    /clients/:id/edit            net.mtgto.controllers.ClientController.edit(id)
 
 POST    /channels/create             net.mtgto.controllers.ChannelController.create
 

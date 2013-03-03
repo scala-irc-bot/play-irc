@@ -1,0 +1,22 @@
+@(id: String, editForm: Form[(String, Int, Option[String], String, Int, Int, String, String, String)])(implicit flash: Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@headers = {}
+@footers = {}
+@main("クライアント編集", headers, footers) {
+  <h2>クライアント編集</h2>
+  @helper.form(action = net.mtgto.controllers.routes.ClientController.edit(id), 'class -> "form-horizontal") {
+    @inputText(editForm("hostname"), '_label -> "ホスト名", 'placeholder -> "ホスト名")
+    @inputText(editForm("port"), '_label -> "ポート", 'placeholder -> "ポート")
+    @inputText(editForm("password"), '_label -> "パスワード", 'placeholder -> "パスワード")
+    @inputText(editForm("encoding"), '_label -> "エンコーディング", 'placeholder -> "エンコーディング")
+    @inputText(editForm("messageDelay"), '_label -> "メッセージ間隔 (msec)", 'placeholder -> "メッセージ間隔")
+    @inputText(editForm("timerDelay"), '_label -> "タイマー間隔 (msec)", 'placeholder -> "タイマー間隔")
+    @inputText(editForm("nickname"), '_label -> "ニックネーム", 'placeholder -> "ニックネーム")
+    @inputText(editForm("username"), '_label -> "ユーザネーム", 'placeholder -> "ユーザネーム")
+    @inputText(editForm("realname"), '_label -> "リアルネーム", 'placeholder -> "リアルネーム")
+    <button class="btn btn-large btn-primary" type="submit">更新</button>
+  }
+}

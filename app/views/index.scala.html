@@ -1,4 +1,4 @@
-@(message: String, client: Option[net.mtgto.domain.Client], channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])(implicit flash: Flash)
+@(message: String, client: Option[net.mtgto.domain.Client], isConnected: Boolean, channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])(implicit flash: Flash)
 
 @headers = {}
 @footers = {
@@ -92,8 +92,12 @@
             </tr>
           </tbody>
         </table>
-        <a class="btn" href="@net.mtgto.controllers.routes.Application.connect">接続</a>
-        <a class="btn" href="@net.mtgto.controllers.routes.Application.disconnect">切断</a>
+        @if(isConnected){
+          <a class="btn" href="@net.mtgto.controllers.routes.Application.disconnect">切断</a>
+        }else{
+          <a class="btn" href="@net.mtgto.controllers.routes.Application.connect">接続</a>
+        }
+        <a class="btn" href="@net.mtgto.controllers.routes.ClientController.showEditView(client.identity.value.toString)">編集</a>
       }
       case None => {
         クライアント指定してないよ

@@ -6,14 +6,14 @@
 @headers = {}
 @footers = {}
 @main("新規クライアント", headers, footers) {
-  <h2>新規ボット</h2>
+  <h2>新規クライアント</h2>
   @helper.form(action = net.mtgto.controllers.routes.ClientController.create, 'class -> "form-horizontal") {
     @inputText(createForm("hostname"), '_label -> "ホスト名", 'placeholder -> "ホスト名")
     @inputText(createForm("port"), '_label -> "ポート", 'placeholder -> "ポート")
     @inputText(createForm("password"), '_label -> "パスワード", 'placeholder -> "パスワード")
     @inputText(createForm("encoding"), '_label -> "エンコーディング", 'placeholder -> "エンコーディング")
-    @inputText(createForm("delay"), '_label -> "メッセージ間隔 (msec)", 'placeholder -> "メッセージ間隔")
-    @inputText(createForm("timerIntervalMillis"), '_label -> "タイマー間隔 (msec)", 'placeholder -> "タイマー間隔")
+    @inputText(createForm("messageDelay"), '_label -> "メッセージ間隔 (msec)", 'placeholder -> "メッセージ間隔")
+    @inputText(createForm("timerDelay"), '_label -> "タイマー間隔 (msec)", 'placeholder -> "タイマー間隔")
     @inputText(createForm("nickname"), '_label -> "ニックネーム", 'placeholder -> "ニックネーム")
     @inputText(createForm("username"), '_label -> "ユーザネーム", 'placeholder -> "ユーザネーム")
     @inputText(createForm("realname"), '_label -> "リアルネーム", 'placeholder -> "リアルネーム")

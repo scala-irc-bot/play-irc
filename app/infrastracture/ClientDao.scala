@@ -46,7 +46,31 @@ class DatabaseClientDao extends ClientDao {
 
   override def save(client: Client): Unit = {
     DB.withConnection{ implicit c =>
-      SQL("""
+      val rowCount =
+        SQL("""
+          UPDATE `clients` SET
+          `hostname` = {hostname},
+          `port` = {port},
+          `password` = {password},
+          `encoding` = {encoding},
+          `message_delay` = {message_delay},
+          `timer_delay` = {timer_delay},
+          `nickname` = {nickname},
+          `username` = {username},
+          `realname` = {realname} WHERE `id` = {id}
+          """)
+          .on('id -> client.id,
+              'hostname -> client.hostname,
+              'port -> client.port,
+              'password -> client.password,
+              'encoding -> client.encoding,
+              'message_delay -> client.messageDelay,
+              'timer_delay -> client.timerDelay,
+              'nickname -> client.nickname,
+              'username -> client.username,
+              'realname -> client.realname).executeUpdate()
+      if (rowCount == 0)
+        SQL("""
           INSERT INTO `clients` (`id`, `hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname`)
           VALUES ({id}, {hostname}, {port}, {password}, {encoding}, {message_delay}, {timer_delay}, {nickname}, {username}, {realname})
           """)
