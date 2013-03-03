@@ -3,15 +3,26 @@ package net.mtgto.infrastracture
 import anorm.Row
 import java.util.UUID
 
+import anorm._
+import anorm.SqlParser._
+import play.api.db.DB
+
 trait ClientDao {
   def findById(id: UUID): Option[Client]
 
   def findAll: Seq[Client]
 
   def save(client: Client): Unit
+
+  /**
+   * return the number of deleted rows
+   */
+  def delete(id: UUID): Int
 }
 
 class DatabaseClientDao extends ClientDao {
+  import play.api.Play.current
+
   protected[this] def convertRowToClient(row: Row): Client = {
     row match {
       case Row(id: String, hostname: String, port: Int, Some(password: String), encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
@@ -21,10 +32,6 @@ class DatabaseClientDao extends ClientDao {
     }
   }
   override def findById(id: UUID): Option[Client] = {
-    import anorm._
-    import anorm.SqlParser._
-    import play.api.db.DB
-    import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname` FROM `clients` WHERE `id` = {id}")
                       .on("id" -> id)().headOption.map(convertRowToClient)
@@ -32,20 +39,12 @@ class DatabaseClientDao extends ClientDao {
   }
 
   override def findAll: Seq[Client] = {
-    import anorm._
-    import anorm.SqlParser._
-    import play.api.db.DB
-    import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname` FROM `clients`")().map(convertRowToClient)
     }
   }
 
   override def save(client: Client): Unit = {
-    import anorm._
-    import anorm.SqlParser._
-    import play.api.db.DB
-    import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("""
           INSERT INTO `clients` (`id`, `hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname`)
@@ -62,5 +61,12 @@ class DatabaseClientDao extends ClientDao {
               'username -> client.username,
               'realname -> client.realname).executeInsert()
       }
+  }
+
+  override def delete(id: UUID): Int = {
+    DB.withConnection{ implicit c =>
+      SQL("DELETE `clients` WHERE `id` = {id}")
+        .on('id -> id).executeUpdate()
+    }
   }
 }
