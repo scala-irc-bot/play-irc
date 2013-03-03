@@ -7,7 +7,9 @@ import play.api.data.Forms._
 
 import net.mtgto.domain.{User, UserRepository, Client, ClientRepository, Channel, ChannelRepository, Bot, BotRepository, IrcBot}
 
+import util.{Try, Success, Failure}
 import scalaz.Identity
+import java.util.UUID
 
 object Application extends Controller with Secured {
   protected[this] val userRepository: UserRepository = UserRepository()
@@ -77,7 +79,11 @@ trait Secured {
 
   protected def getUser(request: RequestHeader): Option[User] = {
     request.session.get("userId").flatMap( userId =>
-      userRepository.resolveOption(Identity(userId.toInt)))
+      Try(UUID.fromString(userId)) match {
+        case Success(id) => userRepository.resolveOption(Identity(id))
+        case Failure(e) => None
+      }
+    )
   }
 
   private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.UserController.login)

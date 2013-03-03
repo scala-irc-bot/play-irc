@@ -1,7 +1,9 @@
 package net.mtgto.infrastracture
 
+import java.util.UUID
+
 case class Client(
-  id: Option[Long],
+  id: UUID,
   hostname: String,
   port: Int,
   password: Option[String],

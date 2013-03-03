@@ -1,25 +1,26 @@
 package net.mtgto.infrastracture
 
 import anorm.Row
+import java.util.UUID
 
 trait ClientDao {
-  def findById(id: Int): Option[Client]
+  def findById(id: UUID): Option[Client]
 
   def findAll: Seq[Client]
 
-  def save(client: Client): Option[Long]
+  def save(client: Client): Unit
 }
 
 class DatabaseClientDao extends ClientDao {
   protected[this] def convertRowToClient(row: Row): Client = {
     row match {
-      case Row(id: Int, hostname: String, port: Int, Some(password: String), encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
-        Client(Some(id), hostname, port, Some(password), encoding, messageDelay, timerDelay, nickname, username, realname)
-      case Row(id: Int, hostname: String, port: Int, None, encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
-        Client(Some(id), hostname, port, None, encoding, messageDelay, timerDelay, nickname, username, realname)
+      case Row(id: String, hostname: String, port: Int, Some(password: String), encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
+        Client(UUID.fromString(id), hostname, port, Some(password), encoding, messageDelay, timerDelay, nickname, username, realname)
+      case Row(id: String, hostname: String, port: Int, None, encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
+        Client(UUID.fromString(id), hostname, port, None, encoding, messageDelay, timerDelay, nickname, username, realname)
     }
   }
-  override def findById(id: Int): Option[Client] = {
+  override def findById(id: UUID): Option[Client] = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
@@ -40,17 +41,18 @@ class DatabaseClientDao extends ClientDao {
     }
   }
 
-  override def save(client: Client): Option[Long] = {
+  override def save(client: Client): Unit = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("""
-          INSERT INTO `clients` (`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname`)
-          VALUES ({hostname}, {port}, {password}, {encoding}, {message_delay}, {timer_delay}, {nickname}, {username}, {realname})
+          INSERT INTO `clients` (`id`, `hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname`)
+          VALUES ({id}, {hostname}, {port}, {password}, {encoding}, {message_delay}, {timer_delay}, {nickname}, {username}, {realname})
           """)
-          .on('hostname -> client.hostname,
+          .on('id -> client.id,
+              'hostname -> client.hostname,
               'port -> client.port,
               'password -> client.password,
               'encoding -> client.encoding,

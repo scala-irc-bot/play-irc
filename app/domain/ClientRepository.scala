@@ -3,10 +3,10 @@ package net.mtgto.domain
 import net.mtgto.infrastracture.{ClientDao, DatabaseClientDao}
 
 import org.sisioh.dddbase.core.EntityResolver
-
 import scalaz.Identity
+import java.util.UUID
 
-trait ClientRepository extends EntityResolver[Client, Int] {
+trait ClientRepository extends EntityResolver[Client, UUID] {
   def findHead: Option[Client]
 }
 
@@ -17,7 +17,7 @@ object ClientRepository {
     private val clientDao: ClientDao = new DatabaseClientDao
 
     private def convertInfraToDomain(infraClient: InfraClient): Client = {
-      Client(Identity(infraClient.id.get.toInt),
+      Client(Identity(infraClient.id),
              infraClient.hostname,
              infraClient.port,
              infraClient.password,
@@ -29,15 +29,15 @@ object ClientRepository {
              infraClient.realname)
     }
 
-    override def resolve(identifier: Identity[Int]): Client = {
+    override def resolve(identifier: Identity[UUID]): Client = {
       resolveOption(identifier).get
     }
 
-    override def resolveOption(identifier: Identity[Int]): Option[Client] = {
+    override def resolveOption(identifier: Identity[UUID]): Option[Client] = {
       clientDao.findById(identifier.value).map(convertInfraToDomain)
     }
 
-    override def contains(identifier: Identity[Int]): Boolean = {
+    override def contains(identifier: Identity[UUID]): Boolean = {
       resolveOption(identifier).isDefined
     }
 

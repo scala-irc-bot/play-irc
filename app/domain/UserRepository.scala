@@ -5,8 +5,9 @@ import net.mtgto.infrastracture.{UserDao, DatabaseUserDao}
 import org.sisioh.dddbase.core.EntityResolver
 
 import scalaz.Identity
+import java.util.UUID
 
-trait UserRepository extends EntityResolver[User, Int] {
+trait UserRepository extends EntityResolver[User, UUID] {
   def findByNameAndPassword(name: String, password: String): Option[User]
 }
 
@@ -20,17 +21,17 @@ object UserRepository {
       }
     }
 
-    override def resolve(identifier: Identity[Int]): User = {
+    override def resolve(identifier: Identity[UUID]): User = {
       resolveOption(identifier).get
     }
 
-    override def resolveOption(identifier: Identity[Int]): Option[User] = {
+    override def resolveOption(identifier: Identity[UUID]): Option[User] = {
       userDao.findById(identifier.value).map {
         infraUser => User(Identity(infraUser.id), infraUser.name)
       }
     }
 
-    override def contains(identifier: Identity[Int]): Boolean = {
+    override def contains(identifier: Identity[UUID]): Boolean = {
       resolveOption(identifier).isDefined
     }
 

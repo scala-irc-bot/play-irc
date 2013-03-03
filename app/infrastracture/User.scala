@@ -1,3 +1,5 @@
 package net.mtgto.infrastracture
 
-case class User(id: Int, name: String)
+import java.util.UUID
+
+case class User(id: UUID, name: String)

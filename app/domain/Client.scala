@@ -2,9 +2,10 @@ package net.mtgto.domain
 
 import scalaz.Identity
 import org.sisioh.dddbase.core.Entity
+import java.util.UUID
 
-trait Client extends Entity[Int] {
-  override val identity: Identity[Int]
+trait Client extends Entity[UUID] {
+  override val identity: Identity[UUID]
   val hostname: String
   val port: Int
   val password: Option[String]
@@ -21,7 +22,7 @@ trait Client extends Entity[Int] {
 
 object Client {
   private case class DefaultClient(
-    identity: Identity[Int],
+    identity: Identity[UUID],
     hostname: String,
     port: Int,
     password: Option[String],
@@ -32,7 +33,7 @@ object Client {
     username: String,
     realname: String
   ) extends Client
-  def apply(identity: Identity[Int],
+  def apply(identity: Identity[UUID],
             hostname: String,
             port: Int,
             password: Option[String],
