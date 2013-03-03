@@ -6,7 +6,8 @@ case class Client(
   port: Int,
   password: Option[String],
   encoding: String,
-  delay: Int,
+  messageDelay: Int,
+  timerDelay: Int,
   nickname: String,
   username: String,
   realname: String

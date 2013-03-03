@@ -18,7 +18,8 @@ object ClientController extends Controller with Secured {
       "port" -> number(1, 65535),
       "password" -> optional(text),
       "encoding" -> nonEmptyText,
-      "delay" -> number,
+      "messageDelay" -> number,
+      "timerDelay" -> number,
       "nickname" -> nonEmptyText,
       "username" -> nonEmptyText,
       "realname" -> nonEmptyText
@@ -35,8 +36,8 @@ object ClientController extends Controller with Secured {
         Redirect(routes.Application.index).flashing("error" -> ("入力項目にエラーがあります" + formWithErrors)),
       success => {
         success match {
-          case (hostname, port, password, encoding, delay, nickname, username, realname) =>
-            val client = ClientFactory(hostname, port, password, encoding, delay, nickname, username, realname)
+          case (hostname, port, password, encoding, messageDelay, timerDelay, nickname, username, realname) =>
+            val client = ClientFactory(hostname, port, password, encoding, messageDelay, timerDelay, nickname, username, realname)
             Redirect(routes.Application.index).flashing("success" -> "クライアントを設定したよ")
         }
       }

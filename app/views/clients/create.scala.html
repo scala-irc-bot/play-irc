@@ -1,4 +1,4 @@
-@(createForm: Form[(String, Int, Option[String], String, Int, String, String, String)])(implicit flash: Flash)
+@(createForm: Form[(String, Int, Option[String], String, Int, Int, String, String, String)])(implicit flash: Flash)
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -13,6 +13,7 @@
     @inputText(createForm("password"), '_label -> "パスワード", 'placeholder -> "パスワード")
     @inputText(createForm("encoding"), '_label -> "エンコーディング", 'placeholder -> "エンコーディング")
     @inputText(createForm("delay"), '_label -> "メッセージ間隔 (msec)", 'placeholder -> "メッセージ間隔")
+    @inputText(createForm("timerIntervalMillis"), '_label -> "タイマー間隔 (msec)", 'placeholder -> "タイマー間隔")
     @inputText(createForm("nickname"), '_label -> "ニックネーム", 'placeholder -> "ニックネーム")
     @inputText(createForm("username"), '_label -> "ユーザネーム", 'placeholder -> "ユーザネーム")
     @inputText(createForm("realname"), '_label -> "リアルネーム", 'placeholder -> "リアルネーム")

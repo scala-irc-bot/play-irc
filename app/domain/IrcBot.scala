@@ -27,7 +27,8 @@ object IrcBot {
           override val port = domainClient.port
           override val password = domainClient.password
           override val encoding = domainClient.encoding
-          override val delay = domainClient.delay
+          override val messageDelay = domainClient.messageDelay
+          override val timerDelay = domainClient.timerDelay
           override val nickname = domainClient.nickname
           override val username = domainClient.username
           override val realname = domainClient.realname

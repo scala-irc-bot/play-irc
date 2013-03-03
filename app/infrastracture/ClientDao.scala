@@ -13,10 +13,10 @@ trait ClientDao {
 class DatabaseClientDao extends ClientDao {
   protected[this] def convertRowToClient(row: Row): Client = {
     row match {
-      case Row(id: Int, hostname: String, port: Int, Some(password: String), encoding: String, delay: Int, nickname: String, username: String, realname: String) =>
-        Client(Some(id), hostname, port, Some(password), encoding, delay, nickname, username, realname)
-      case Row(id: Int, hostname: String, port: Int, None, encoding: String, delay: Int, nickname: String, username: String, realname: String) =>
-        Client(Some(id), hostname, port, None, encoding, delay, nickname, username, realname)
+      case Row(id: Int, hostname: String, port: Int, Some(password: String), encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
+        Client(Some(id), hostname, port, Some(password), encoding, messageDelay, timerDelay, nickname, username, realname)
+      case Row(id: Int, hostname: String, port: Int, None, encoding: String, messageDelay: Int, timerDelay: Int, nickname: String, username: String, realname: String) =>
+        Client(Some(id), hostname, port, None, encoding, messageDelay, timerDelay, nickname, username, realname)
     }
   }
   override def findById(id: Int): Option[Client] = {
@@ -25,7 +25,7 @@ class DatabaseClientDao extends ClientDao {
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients` WHERE `id` = {id}")
+      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname` FROM `clients` WHERE `id` = {id}")
                       .on("id" -> id)().headOption.map(convertRowToClient)
     }
   }
@@ -36,7 +36,7 @@ class DatabaseClientDao extends ClientDao {
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname` FROM `clients`")().map(convertRowToClient)
+      SQL("SELECT `id`,`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname` FROM `clients`")().map(convertRowToClient)
     }
   }
 
@@ -47,14 +47,15 @@ class DatabaseClientDao extends ClientDao {
     import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("""
-          INSERT INTO `clients` (`hostname`,`port`,`password`,`encoding`,`delay`,`nickname`,`username`,`realname`)
-          VALUES ({hostname}, {port}, {password}, {encoding}, {delay}, {nickname}, {username}, {realname})
+          INSERT INTO `clients` (`hostname`,`port`,`password`,`encoding`,`message_delay`,`timer_delay`,`nickname`,`username`,`realname`)
+          VALUES ({hostname}, {port}, {password}, {encoding}, {message_delay}, {timer_delay}, {nickname}, {username}, {realname})
           """)
           .on('hostname -> client.hostname,
               'port -> client.port,
               'password -> client.password,
               'encoding -> client.encoding,
-              'delay -> client.delay,
+              'message_delay -> client.messageDelay,
+              'timer_delay -> client.timerDelay,
               'nickname -> client.nickname,
               'username -> client.username,
               'realname -> client.realname).executeInsert()

@@ -9,35 +9,41 @@ trait Client extends Entity[Int] {
   val port: Int
   val password: Option[String]
   val encoding: String
-  val delay: Int
+  val messageDelay: Int
+  val timerDelay: Int
 
   val nickname: String
   val username: String
   val realname: String
 
-  override def toString: String = Seq(identity, hostname, port, password, encoding, delay, nickname, username, realname).mkString("Client(", ", ",")")
+  override def toString: String = Seq(identity, hostname, port, password, encoding, messageDelay, timerDelay, nickname, username, realname).mkString("Client(", ", ",")")
 }
 
 object Client {
-  def apply(argIdentity: Identity[Int],
-            argHostname: String,
-            argPort: Int,
-            argPassword: Option[String],
-            argEncoding: String,
-            argDelay: Int,
-            argNickname: String,
-            argUsername: String,
-            argRealname: String): Client = {
-    new Client {
-      override val identity: Identity[Int] = argIdentity
-      override val hostname: String = argHostname
-      override val port: Int = argPort
-      override val password: Option[String] = argPassword
-      override val encoding: String = argEncoding
-      override val delay: Int = argDelay
-      override val nickname: String = argNickname
-      override val username: String = argUsername
-      override val realname: String = argRealname
-    }
+  private case class DefaultClient(
+    identity: Identity[Int],
+    hostname: String,
+    port: Int,
+    password: Option[String],
+    encoding: String,
+    messageDelay: Int,
+    timerDelay: Int,
+    nickname: String,
+    username: String,
+    realname: String
+  ) extends Client
+  def apply(identity: Identity[Int],
+            hostname: String,
+            port: Int,
+            password: Option[String],
+            encoding: String,
+            messageDelay: Int,
+            timerDelay: Int,
+            nickname: String,
+            username: String,
+            realname: String): Client = {
+    DefaultClient(
+      identity, hostname, port, password, encoding, messageDelay, timerDelay, nickname, username, realname
+    )
   }
 }

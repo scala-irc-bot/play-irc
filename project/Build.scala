@@ -23,6 +23,7 @@ object ApplicationBuild extends Build {
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
     // Add your own project settings here
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xlint", "-encoding", "UTF8"),
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns),
     resolvers += "mtgto repos" at "http://scala-irc-bot.github.com/scala-irc-bot/maven/",
     resolvers += "twitter repos" at "http://maven.twttr.com",

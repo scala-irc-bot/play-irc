@@ -22,7 +22,8 @@ object ClientRepository {
              infraClient.port,
              infraClient.password,
              infraClient.encoding,
-             infraClient.delay,
+             infraClient.messageDelay,
+             infraClient.timerDelay,
              infraClient.nickname,
              infraClient.username,
              infraClient.realname)
