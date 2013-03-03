@@ -25,6 +25,20 @@ object UserController extends Controller with Secured {
     )
   )
 
+  protected[this] val createForm = Form(
+    tuple(
+      "name" -> nonEmptyText,
+      "password" -> text
+    )
+  )
+
+  protected[this] val changePasswordForm = Form(
+    tuple(
+      "oldPassword" -> text,
+      "newPassword" -> text
+    )
+  )
+
   def login = Action { implicit request =>
     Ok(views.html.users.login(loginForm))
   }
@@ -41,8 +55,7 @@ object UserController extends Controller with Secured {
         userNameAndPassword => {
           val user: Option[User] = userNameAndPassword match {
             case (name, password) => {
-              val passwordBytes = (name + passwordHashingSalt + password).getBytes("UTF-8")
-              val hashedPassword = toHashedString(passwordBytes)
+              val hashedPassword = getHashedPassword(name, password)
               userRepository.findByNameAndPassword(name, hashedPassword).orElse {
                 if (name == adminName && password == adminPassword) {
                   val adminUser = UserFactory.createUser(name, hashedPassword)
@@ -62,6 +75,41 @@ object UserController extends Controller with Secured {
           }
         }
       )
+  }
+
+  def create = IsAuthenticated { user => implicit request =>
+    createForm.bindFromRequest.fold(
+      formWithErrors =>
+        Redirect(routes.Application.index).flashing("error" -> ("入力項目にエラーがあります" + formWithErrors)),
+      success => success match {
+        case (name, password) =>
+          userRepository.store(UserFactory.createUser(name, getHashedPassword(name, password)))
+          Redirect(routes.Application.index).flashing("success" -> ("ユーザ " + name + " を作成しました"))
+      }
+    )
+  }
+
+  def changePassword = IsAuthenticated { user => implicit request =>
+    changePasswordForm.bindFromRequest.fold(
+      formWithErrors =>
+        Redirect(routes.Application.index).flashing("error" -> ("入力項目にエラーがあります" + formWithErrors)),
+      success => success match {
+        case (oldPassword, newPassword) =>
+          val oldHashedPassword = getHashedPassword(user.name, oldPassword)
+          userRepository.findByNameAndPassword(user.name, oldHashedPassword) match {
+            case Some(user) =>
+              userRepository.store(User(user.identity, user.name, Some(getHashedPassword(user.name, newPassword))))
+              Redirect(routes.Application.index).flashing("success" -> "パスワードを変更しました")
+            case _ =>
+              Redirect(routes.Application.index).flashing("error" -> "パスワードが違うよ")
+          }
+      }
+    )
+  }
+
+  protected[this] def getHashedPassword(name: String, password: String): String = {
+    val passwordBytes = (name + passwordHashingSalt + password).getBytes("UTF-8")
+    toHashedString(passwordBytes)
   }
 
   protected[this] def toHashedString(bytes: Array[Byte]): String = {

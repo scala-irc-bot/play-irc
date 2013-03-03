@@ -1,4 +1,4 @@
-@(message: String, client: Option[net.mtgto.domain.Client], isConnected: Boolean, channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot])(implicit flash: Flash)
+@(message: String, client: Option[net.mtgto.domain.Client], isConnected: Boolean, channels: Seq[net.mtgto.domain.Channel], bots: Seq[net.mtgto.domain.Bot], users: Seq[net.mtgto.domain.User])(implicit flash: Flash)
 
 @headers = {}
 @footers = {
@@ -20,6 +20,40 @@
           }
       );
   });
+  $(function(){
+      $('#create_user_cancel').click(
+          function(){
+              $('#modal_create_user').modal('hide');
+          }
+      );
+      $('a.create_user').click(
+          function(){
+              $('#modal_create_user').modal('show');
+          }
+      );
+      $('#create_user_submit').click(
+          function(){
+              $('#form_create_user').submit();
+          }
+      );
+  });
+  $(function(){
+      $('#change_password_cancel').click(
+          function(){
+              $('#modal_change_password').modal('hide');
+          }
+      );
+      $('a.change_password').click(
+          function(){
+              $('#modal_change_password').modal('show');
+          }
+      );
+      $('#change_password_submit').click(
+          function(){
+              $('#form_change_password').submit();
+          }
+      );
+  });
 </script>
 }
 @main("トップページ", headers, footers) {
@@ -37,6 +71,42 @@
       <div class="modal-footer">
         <a href="#" class="btn" id="add_channel_cancel">キャンセル</a>
         <a href="#" class="btn btn-primary" id="add_channel_submit">追加</a>
+      </div>
+    }
+  </div>
+  <div class='modal hide' id='modal_create_user'>
+    @helper.form(action = net.mtgto.controllers.routes.UserController.create, 'id -> "form_create_user") {
+      <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h3 id='modal_create_user_title'>新規ユーザを追加します</h3>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="text" placeholder="名前" id="create_user_name" name="name"></input>
+          <input type="text" placeholder="パスワード" id="create_user_password" name="password"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" id="create_user_cancel">キャンセル</a>
+        <a href="#" class="btn btn-primary" id="create_user_submit">変更</a>
+      </div>
+    }
+  </div>
+  <div class='modal hide' id='modal_change_password'>
+    @helper.form(action = net.mtgto.controllers.routes.UserController.changePassword, 'id -> "form_change_password") {
+      <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h3 id='modal_change_password_title'>パスワードを変更します</h3>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="text" placeholder="古いパスワード" id="change_password_old_password" name="oldPassword"></input>
+          <input type="text" placeholder="新しいパスワード" id="change_password_new_password" name="newPassword"></input>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" id="change_password_cancel">キャンセル</a>
+        <a href="#" class="btn btn-primary" id="change_password_submit">変更</a>
       </div>
     }
   </div>
@@ -152,5 +222,25 @@
       </tbody>
     </table>
     <a class="btn" href="@net.mtgto.controllers.routes.BotController.showCreateView">追加</a>
+  </section>
+    <section id="users" class="container">
+    <h2>ユーザ</h2>
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>名前</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(user <- users) {
+            <tr>
+              <td>@user.name</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <a class="btn" href="@net.mtgto.controllers.routes.UserController.logout">ログアウト</a>
+      <a class="btn create_user" href="#">ユーザ追加</a>
+      <a class="btn change_password" href="#">パスワード変更</a>
   </section>
 }

@@ -26,7 +26,8 @@ object Application extends Controller with Secured {
     val client: Option[Client] = clientRepository.findHead
     val channels: Seq[Channel] = channelRepository.findAll
     val bots: Seq[Bot] = botRepository.findAll
-    Ok(views.html.index("ようこそ、" + user.name + " さん", client, ircBot.isConnected, channels, bots))
+    val users: Seq[User] = userRepository.findAll
+    Ok(views.html.index("ようこそ、" + user.name + " さん", client, ircBot.isConnected, channels, bots, users))
   }
 
   def connect = IsAuthenticated { user => implicit request =>

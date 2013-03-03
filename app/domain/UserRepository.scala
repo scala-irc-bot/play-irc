@@ -9,14 +9,21 @@ import java.util.UUID
 
 trait UserRepository extends Repository[User, UUID] {
   def findByNameAndPassword(name: String, password: String): Option[User]
+  def findAll: Seq[User]
 }
 
 object UserRepository {
   def apply(): UserRepository = new UserRepository {
     private val userDao: UserDao = new DatabaseUserDao
 
-    def findByNameAndPassword(name: String, password: String): Option[User] = {
+    override def findByNameAndPassword(name: String, password: String): Option[User] = {
       userDao.findByNameAndPassword(name, password).map {
+        infraUser => User(Identity(infraUser.id), infraUser.name, None)
+      }
+    }
+
+    override def findAll: Seq[User] = {
+      userDao.findAll.map {
         infraUser => User(Identity(infraUser.id), infraUser.name, None)
       }
     }

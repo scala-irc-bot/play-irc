@@ -9,6 +9,7 @@ import java.util.UUID
 trait UserDao {
   def findById(id: UUID): Option[User]
   def findByNameAndPassword(name: String, password: String): Option[User]
+  def findAll: Seq[User]
   def save(id: UUID, name: String, password: String): Unit
 
   /**
@@ -32,6 +33,14 @@ class DatabaseUserDao extends UserDao {
       SQL("SELECT `id` FROM `users` WHERE `name` = {name} AND `password` = {password}").on("name" -> name, "password" -> password).as(scalar[String].singleOpt).map {
         id => User(UUID.fromString(id), name)
       }
+    }
+  }
+
+  override def findAll: Seq[User] = {
+    DB.withConnection{ implicit c =>
+      SQL("SELECT `id`,`name` FROM `users`")().map( row => row match {
+        case Row(id: String, name: String) => User(UUID.fromString(id), name)
+      }).toList
     }
   }
 
