@@ -19,17 +19,7 @@ object Application extends Controller with Secured {
   protected[this] val channelRepository: ChannelRepository = ChannelRepository()
 
   protected[this] val botRepository: BotRepository = BotRepository()
-
-  protected[this] val loginForm = Form(
-    tuple(
-      "name" -> nonEmptyText,
-      "password" -> text
-    ) verifying ("ユーザ名かパスワードが違います", result => result match {
-      case (name, password) => userRepository.findByNameAndPassword(name, password).isDefined
-      case _ => false
-    })
-  )
-
+  
   val ircBot: IrcBot = IrcBot()
 
   def index = IsAuthenticated { user => implicit request =>

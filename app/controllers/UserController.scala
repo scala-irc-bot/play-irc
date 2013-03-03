@@ -35,7 +35,6 @@ object UserController extends Controller with Secured {
 
   def authenticate = Action {
     implicit request =>
-      Logger.info("adminName:%s, adminPassword:%s".format(adminName, adminPassword))
       loginForm.bindFromRequest.fold(
         formWithErrors =>
           BadRequest(views.html.users.login(formWithErrors)),
@@ -46,7 +45,9 @@ object UserController extends Controller with Secured {
               val hashedPassword = toHashedString(passwordBytes)
               userRepository.findByNameAndPassword(name, hashedPassword).orElse {
                 if (name == adminName && password == adminPassword) {
-                  UserFactory.createAdminUser(name, hashedPassword)
+                  val adminUser = UserFactory.createUser(name, hashedPassword)
+                  userRepository.store(adminUser)
+                  userRepository.findByNameAndPassword(name, hashedPassword)
                 } else {
                   None
                 }
