@@ -17,10 +17,10 @@ POST    /channels/create             net.mtgto.controllers.ChannelController.cre
 
 GET     /bots/create                 net.mtgto.controllers.BotController.showCreateView
 POST    /bots/create                 net.mtgto.controllers.BotController.create
-GET     /bots/:id/edit               net.mtgto.controllers.BotController.showEditView(id: Int)
-POST    /bots/:id/edit               net.mtgto.controllers.BotController.edit(id: Int)
-GET     /bots/:id/disable            net.mtgto.controllers.BotController.disable(id: Int)
-GET     /bots/:id/enable             net.mtgto.controllers.BotController.enable(id: Int)
+GET     /bots/:id/edit               net.mtgto.controllers.BotController.showEditView(id)
+POST    /bots/:id/edit               net.mtgto.controllers.BotController.edit(id)
+GET     /bots/:id/disable            net.mtgto.controllers.BotController.disable(id)
+GET     /bots/:id/enable             net.mtgto.controllers.BotController.enable(id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

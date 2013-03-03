@@ -5,8 +5,9 @@ import net.mtgto.infrastracture.{BotDao, DatabaseBotDao, Bot => InfraBot}
 import org.sisioh.dddbase.core.{Repository, EntityNotFoundException}
 
 import scalaz.Identity
+import java.util.UUID
 
-trait BotRepository extends Repository[Bot, Int] {
+trait BotRepository extends Repository[Bot, UUID] {
   def findAll: Seq[Bot]
 }
 
@@ -20,17 +21,17 @@ object BotRepository {
       }
     }
 
-    override def resolve(identifier: Identity[Int]): Bot = {
+    override def resolve(identifier: Identity[UUID]): Bot = {
       resolveOption(identifier).get
     }
 
-    override def resolveOption(identifier: Identity[Int]): Option[Bot] = {
+    override def resolveOption(identifier: Identity[UUID]): Option[Bot] = {
       botDao.findById(identifier.value).map {
         infraBot => Bot(Identity(infraBot.id), infraBot.name, infraBot.filename, infraBot.config, infraBot.enabled)
       }
     }
 
-    override def contains(identifier: Identity[Int]): Boolean = {
+    override def contains(identifier: Identity[UUID]): Boolean = {
       resolveOption(identifier).isDefined
     }
 
@@ -43,7 +44,7 @@ object BotRepository {
       botDao.save(infraBot)
     }
 
-    override def delete(identity: Identity[Int]): Unit = {
+    override def delete(identity: Identity[UUID]): Unit = {
       if (botDao.delete(identity.value) == 0) {
         throw new EntityNotFoundException
       }

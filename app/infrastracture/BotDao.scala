@@ -1,29 +1,30 @@
 package net.mtgto.infrastracture
 
 import anorm.Row
+import java.util.UUID
 
 trait BotDao {
-  def findById(id: Int): Option[Bot]
+  def findById(id: UUID): Option[Bot]
   def findAll: Seq[Bot]
-  def save(name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot]
+  def save(id: UUID, name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot]
   def save(bot: Bot): Option[Bot]
   /**
    * return the number of deleted rows
    */
-  def delete(id: Int): Int
+  def delete(id: UUID): Int
 }
 
 class DatabaseBotDao extends BotDao {
   protected[this] def convertRowToBot(row: Row): Bot = {
     row match {
-      case Row(id: Int, name: String, filename: String, Some(config: java.sql.Clob), enabled: Byte) =>
-        Bot(id, name, filename, Some(config.getSubString(1, config.length.toInt)), enabled != 0)
-      case Row(id: Int, name: String, filename: String, None, enabled: Byte) =>
-        Bot(id, name, filename, None, enabled != 0)
+      case Row(id: String, name: String, filename: String, Some(config: java.sql.Clob), enabled: Byte) =>
+        Bot(UUID.fromString(id), name, filename, Some(config.getSubString(1, config.length.toInt)), enabled != 0)
+      case Row(id: String, name: String, filename: String, None, enabled: Byte) =>
+        Bot(UUID.fromString(id), name, filename, None, enabled != 0)
     }
   }
 
-  override def findById(id: Int): Option[Bot] = {
+  override def findById(id: UUID): Option[Bot] = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
@@ -43,15 +44,15 @@ class DatabaseBotDao extends BotDao {
     }
   }
 
-  override def save(name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot] = {
+  override def save(id: UUID, name: String, filename: String, config: Option[String], enabled: Boolean): Option[Bot] = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("INSERT INTO `bots` (`name`,`filename`,`config`,`enabled`) VALUES ({name},{filename},{config},{enabled})")
-        .on("name" -> name, "filename" -> filename, "config" -> config, "enabled" -> (if (enabled) "1" else "0")).executeInsert()
-        .map(id => Bot(id.toInt, name, filename, config, enabled))
+      SQL("INSERT INTO `bots` (`id`, `name`,`filename`,`config`,`enabled`) VALUES ({id},{name},{filename},{config},{enabled})")
+        .on('id -> id, 'name -> name, 'filename -> filename, 'config -> config, 'enabled -> (if (enabled) "1" else "0")).executeInsert()
+        .map(_ => Bot(id, name, filename, config, enabled))
     }
   }
 
@@ -70,7 +71,7 @@ class DatabaseBotDao extends BotDao {
     }
   }
 
-  override def delete(id: Int): Int = {
+  override def delete(id: UUID): Int = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
