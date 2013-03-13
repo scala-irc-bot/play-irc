@@ -35,8 +35,8 @@ object IrcBot {
           override val channels = domainChannels.map(_.name).toArray
           override val bots = domainBots.map {
             bot =>
-              val botConfig: Option[BotConfig] = bot.config.map(Eval(_))
-              bot.name -> Option.empty[BotConfig]
+              val botConfig: Option[BotConfig] = bot.config.map(Eval[BotConfig](_))
+              (bot.name -> botConfig)
           }.toArray
         }
       ))
