@@ -27,7 +27,9 @@ object ApplicationBuild extends Build {
     resolvers += Resolver.file("Local Ivy Repository", file(Path.userHome.absolutePath+"/.ivy2/local"))(Resolver.ivyStylePatterns),
     resolvers += "mtgto repos" at "http://scala-irc-bot.github.com/scala-irc-bot/maven/",
     resolvers += "twitter repos" at "http://maven.twttr.com",
-    lessEntryPoints <<= baseDirectory(customLessEntryPoints)
+    resolvers += "scala-dddbase Repository" at "http://sisioh.github.com/scala-dddbase/repos/release/",
+    lessEntryPoints <<= baseDirectory(customLessEntryPoints),
+    unmanagedBase <<= baseDirectory  / "bots"
   )
 
 }
