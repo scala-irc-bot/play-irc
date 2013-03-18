@@ -1,11 +1,15 @@
-package net.mtgto.infrastracture
+package net.mtgto.infrastructure
 
+import anorm._
+import anorm.SqlParser._
 import java.util.UUID
+import play.api.db.DB
+import play.api.Play.current
 
 trait ChannelDao {
   def findById(id: UUID): Option[Channel]
   def findAll: Seq[Channel]
-  def save(id: UUID, name: String): Option[Channel]
+  def save(channel: Channel): Unit
   /**
    * return the number of deleted rows
    */
@@ -26,10 +30,6 @@ class DatabaseChannelDao extends ChannelDao {
   }
 
   override def findAll: Seq[Channel] = {
-    import anorm._
-    import anorm.SqlParser._
-    import play.api.db.DB
-    import play.api.Play.current
     DB.withConnection{ implicit c =>
       SQL("SELECT `id`,`name` FROM `channels`")().collect {
         case Row(id: String, name: String) => Channel(UUID.fromString(id), name)
@@ -37,15 +37,22 @@ class DatabaseChannelDao extends ChannelDao {
     }
   }
 
-  override def save(id: UUID, name: String): Option[Channel] = {
+  override def save(channel: Channel): Unit = {
     import anorm._
     import anorm.SqlParser._
     import play.api.db.DB
     import play.api.Play.current
     DB.withConnection{ implicit c =>
-      SQL("INSERT INTO `channels` (`id`, `name`) VALUES ({id},{name})")
-        .on('id -> id, 'name -> name).executeInsert().map { _ =>
-        Channel(id, name)
+      val rowCount =
+      SQL("""
+          UPDATE `channels` SET
+          `name` = {name} WHERE `id` = {id}
+          """)
+          .on('id -> channel.id,
+              'name -> channel.name).executeUpdate()
+      if (rowCount == 0) {
+        SQL("INSERT INTO `channels` (`id`, `name`) VALUES ({id},{name})")
+          .on('id -> channel.id, 'name -> channel.name).executeInsert()
       }
     }
   }

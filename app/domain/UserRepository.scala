@@ -1,6 +1,6 @@
 package net.mtgto.domain
 
-import net.mtgto.infrastracture.{UserDao, DatabaseUserDao}
+import net.mtgto.infrastructure.{UserDao, DatabaseUserDao}
 
 import org.sisioh.dddbase.core.{EntityNotFoundException, Repository}
 

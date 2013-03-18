@@ -1,6 +1,6 @@
 package net.mtgto.domain
 
-import net.mtgto.infrastracture.{ClientDao, DatabaseClientDao}
+import net.mtgto.infrastructure.{ClientDao, DatabaseClientDao}
 
 import org.sisioh.dddbase.core.{EntityNotFoundException, Repository}
 import scalaz.Identity
@@ -12,7 +12,7 @@ trait ClientRepository extends Repository[Client, UUID] {
 
 object ClientRepository {
   def apply(): ClientRepository = new ClientRepository {
-    import net.mtgto.infrastracture.{Client => InfraClient}
+    import net.mtgto.infrastructure.{Client => InfraClient}
 
     private val clientDao: ClientDao = new DatabaseClientDao
 

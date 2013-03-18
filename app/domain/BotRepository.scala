@@ -1,6 +1,6 @@
 package net.mtgto.domain
 
-import net.mtgto.infrastracture.{BotDao, DatabaseBotDao, Bot => InfraBot}
+import net.mtgto.infrastructure.{BotDao, DatabaseBotDao, Bot => InfraBot}
 
 import org.sisioh.dddbase.core.{Repository, EntityNotFoundException}
 
